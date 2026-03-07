@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
+import streamlit as st
+import streamlit.components.v1 as components
 
 # -----------------------------
 # Load trained model files
@@ -167,3 +169,19 @@ if st.button("Predict Attrition"):
     else:
         for r in reasons:
             st.write("•", r)
+
+
+
+st.title("Power BI Dashboard")
+
+powerbi_iframe = """
+<iframe title="MH 2026 copy - Copy"
+width="100%"
+height="450"
+src="https://app.powerbi.com/view?r=eyJrIjoiYzE4YmRhMDgtNGJhNC00ZTE0LThiOGItNDI0NDg2YTg5NWNjIiwidCI6IjQwZjkzODFiLWViNzEtNDlhMi1iMjVhLWU3MDBkNDgxZDVjMSJ9"
+frameborder="0"
+allowFullScreen="true">
+</iframe>
+"""
+
+components.html(powerbi_iframe, height=450)
