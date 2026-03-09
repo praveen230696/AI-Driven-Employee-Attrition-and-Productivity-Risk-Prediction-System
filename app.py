@@ -4,6 +4,8 @@ import numpy as np
 import joblib
 import streamlit.components.v1 as components
 
+st.set_page_config(page_title="AI Attrition Predictor", layout="wide")
+
 # -----------------------------
 # Load trained model files
 # -----------------------------
@@ -12,254 +14,336 @@ vectorizer = joblib.load("tfidf_vectorizer.pkl")
 model_columns = joblib.load("model_columns.pkl")
 
 # -----------------------------
-# App Title
+# Header
 # -----------------------------
-st.title("🤖 AI Employee Attrition Prediction System")
-st.write("Enter employee details to predict attrition risk")
-
-# -----------------------------
-# User Inputs
-# -----------------------------
-age = st.number_input("Age", 18, 60)
-
-business_travel = st.selectbox(
-    "Business Travel",
-    ["Travel_Rarely", "Travel_Frequently", "Non-Travel"]
+st.markdown(
+"""
+<h1 style='text-align: center;'>🤖 AI Employee Attrition Prediction System</h1>
+<h3 style='text-align: center;'>HR Analytics Prediction Dashboard</h3>
+<p style='text-align: center;'>Enter employee information to estimate attrition probability.</p>
+""",
+unsafe_allow_html=True
 )
 
-department = st.selectbox(
-    "Department",
-    [
-        "Data Science",
-        "Network Administration",
-        "Cyber Security",
-        "IT Services",
-        "Software Development"
-    ]
-)
-
-distance = st.number_input("Distance From Home (in km)", 0, 50)
-
-education = st.selectbox(
-    "Education",
-    [1,2,3,4,5],
-    format_func=lambda x:{
-        1:"1 - Below College",
-        2:"2 - Degree",
-        3:"3 - Graduation",
-        4:"4 - Master's",
-        5:"5 - PhD"
-    }[x]
-)
-
-env_sat = st.selectbox(
-    "Environment Satisfaction (1 = Low, 5 = High)",
-    [1,2,3,4,5]
-)
-
-gender = st.selectbox(
-    "Gender",
-    ["Male","Female","Other"]
-)
-
-salary = st.number_input("Monthly Income", 10000, 200000)
-
-job_involvement = st.selectbox(
-    "Job Involvement (1–5)",
-    [1,2,3,4,5]
-)
-
-job_level = st.selectbox(
-    "Job Level (1 = Lowest, 8 = Highest)",
-    [1,2,3,4,5]
-)
-
-job_role = st.selectbox(
-    "Job Role",
-    [
-        "QA Analyst",
-        "Technician",
-        "Manager",
-        "Director",
-        "Software Engineer",
-        "Help Desk",
-        "Developer",
-        "Consultant",
-        "HR",
-        "IT",
-        "Business Analyst",
-        "Support"
-    ]
-)
-
-job_satisfaction = st.selectbox(
-    "Job Satisfaction (1–5)",
-    [1,2,3,4,5]
-)
-
-marital_status = st.selectbox(
-    "Marital Status",
-    ["Single", "Married", "Divorced"]
-)
-
-companies_worked = st.number_input("Number of Companies Worked", 0, 10)
-
-overtime = st.selectbox("Overtime", ["Yes", "No"])
-
-salary_hike = st.number_input("Percent Salary Hike", 0, 50)
-
-total_exp = st.number_input("Total Working Years", 0, 40)
-
-work_life = st.selectbox(
-    "Work Life Balance (1–5)",
-    [1,2,3,4,5]
-)
-
-years_company = st.number_input("Years At Company", 0, 40)
-
-years_role = st.number_input("Years In Current Role", 0, 20)
-
-years_promo = st.number_input("Years Since Last Promotion", 0, 15)
-
-feedback = st.text_area("Employee Feedback (Required)")
+st.divider()
 
 # -----------------------------
-# Feature Engineering (internal)
+# Employee Information
 # -----------------------------
-ExperienceRatio = years_company / (total_exp + 1)
+st.markdown(
+"<h3 style='text-align:center;'>📋 Employee Details</h3>",
+unsafe_allow_html=True
+)
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    age = st.number_input("Age", 18, 60)
+
+    business_travel = st.selectbox(
+        "Business Travel",
+        ["Travel_Rarely", "Travel_Frequently", "Non-Travel"]
+    )
+
+    department = st.selectbox(
+        "Department",
+        [
+            "Data Science",
+            "Network Administration",
+            "Cyber Security",
+            "IT Services",
+            "Software Development"
+        ]
+    )
+
+    distance = st.number_input("Distance From Home (km)", 0, 50)
+
+    education = st.selectbox(
+        "Education",
+        [1,2,3,4,5],
+        format_func=lambda x:{
+            1:"1 - Below College",
+            2:"2 - Degree",
+            3:"3 - Graduation",
+            4:"4 - Master's",
+            5:"5 - PhD"
+        }[x]
+    )
+
+    env_sat = st.selectbox("Environment Satisfaction", [1,2,3,4,5])
+
+
+    gender = st.selectbox("Gender", ["Male","Female","Other"])
+
+with col2:
+
+    salary = st.number_input("Monthly Income", 10000, 200000)
+
+    job_involvement = st.selectbox("Job Involvement", [1,2,3,4,5])
+
+    job_level = st.selectbox("Job Level", [1,2,3,4,5])
+
+    job_role = st.selectbox(
+        "Job Role",
+        [
+            "QA Analyst",
+            "Technician",
+            "Manager",
+            "Director",
+            "Software Engineer",
+            "Help Desk",
+            "Developer",
+            "Consultant",
+            "HR",
+            "IT",
+            "Business Analyst",
+            "Support"
+        ]
+    )
+
+    job_satisfaction = st.selectbox("Job Satisfaction", [1,2,3,4,5])
+
+    marital_status = st.selectbox(
+        "Marital Status",
+        ["Single", "Married", "Divorced"]
+    )
+
+    companies_worked = st.number_input("Companies Worked", 0, 10)
+
+with col3:
+
+    overtime = st.selectbox("Overtime", ["Yes", "No"])
+
+    salary_hike = st.number_input("Percent Salary Hike", 0, 50)
+
+    total_exp = st.number_input("Total Working Years", 0, 40)
+
+    work_life = st.selectbox("Work Life Balance", [1,2,3,4,5])
+
+    years_company = st.number_input("Years At Company", 0, 40)
+
+    years_role = st.number_input("Years In Current Role", 0, 20)
+
+    years_promo = st.number_input("Years Since Last Promotion", 0, 15)
+
+st.divider()
+
+# -----------------------------
+# Employee Feedback
+# -----------------------------
+st.markdown(
+"<h3 style='text-align:center;'>💬 Employee Feedback</h3>",
+unsafe_allow_html=True
+)
+
+feedback = st.text_area(
+    "Enter employee feedback or comments",
+    height=120
+)
+
+st.divider()
+
+# -----------------------------
+# Feature Engineering
+# -----------------------------
+ExperienceRatio = years_company / total_exp if total_exp != 0 else 0
 PromotionGap = years_company - years_promo
 IncomePerLevel = salary / job_level if job_level != 0 else 0
 CompanySwitchRate = companies_worked / total_exp if total_exp != 0 else 0
 RoleStability = years_role / years_company if years_company != 0 else 0
-PromotionDelay = total_exp - years_promo
-LowIncomeFlag = 1 if salary < 30000 else 0
+PromotionDelay = years_company - years_promo
+LowIncomeFlag = 1 if salary < 35000 else 0
 
 # -----------------------------
-# Prediction
+# Prediction Section
 # -----------------------------
-if st.button("Predict Attrition"):
+st.markdown(
+"<h3 style='text-align:center;'>📊 Attrition Prediction</h3>",
+unsafe_allow_html=True
+)
 
-    # -----------------------------
-    # Input Validation
-    # -----------------------------
-    if feedback.strip() == "":
-        st.error("Employee Feedback is required. Please enter feedback.")
-        st.stop()
+prediction_container = st.container()
 
-    if salary <= 0:
-        st.error("Monthly Income must be greater than 0")
-        st.stop()
+center_btn = st.columns([1,1,1,1,1,1,1,1,1])
 
-    if total_exp < years_company:
-        st.error("Years At Company cannot be greater than Total Working Years")
-        st.stop()
+with center_btn[4]:
+    predict_clicked = st.button("Predict Attrition")
 
-    if years_role > years_company:
-        st.error("Years In Current Role cannot exceed Years At Company")
-        st.stop()
+if predict_clicked:
 
-    # -----------------------------
-    # Create input dataframe
-    # -----------------------------
-    input_data = pd.DataFrame({
-        'Age':[age],
-        'BusinessTravel':[business_travel],
-        'Department':[department],
-        'DistanceFromHome':[distance],
-        'Education':[education],
-        'EnvironmentSatisfaction':[env_sat],
-        'Gender':[gender],
-        'MonthlyIncome':[salary],
-        'JobInvolvement':[job_involvement],
-        'JobLevel':[job_level],
-        'JobRole':[job_role],
-        'JobSatisfaction':[job_satisfaction],
-        'MaritalStatus':[marital_status],
-        'NumCompaniesWorked':[companies_worked],
-        'OverTime':[overtime],
-        'PercentSalaryHike':[salary_hike],
-        'TotalWorkingYears':[total_exp],
-        'WorkLifeBalance':[work_life],
-        'YearsAtCompany':[years_company],
-        'YearsInCurrentRole':[years_role],
-        'YearsSinceLastPromotion':[years_promo],
-        'ExperienceRatio':[ExperienceRatio],
-        'PromotionGap':[PromotionGap],
-        'IncomePerLevel':[IncomePerLevel],
-        'CompanySwitchRate':[CompanySwitchRate],
-        'RoleStability':[RoleStability],
-        'PromotionDelay':[PromotionDelay],
-        'LowIncomeFlag':[LowIncomeFlag]
-    })
+    with prediction_container:
 
-    # Encode categorical fields
-    input_encoded = pd.get_dummies(input_data)
+        valid = True
 
-    # TF-IDF vector for feedback
-    feedback_vector = vectorizer.transform([feedback if feedback else ""])
-    feedback_df = pd.DataFrame(feedback_vector.toarray())
+        if feedback.strip() == "":
+            st.error("Employee Feedback is required.")
+            valid = False
 
-    # Merge structured + feedback features
-    final_input = pd.concat([input_encoded, feedback_df], axis=1)
-    final_input = final_input.reindex(columns=model_columns, fill_value=0)
+        if salary <= 0:
+            st.error("Monthly Income must be greater than 0")
+            valid = False
 
-    # Predict probability
-    prediction = model.predict_proba(final_input)[0][1]
+        if total_exp < years_company:
+            st.error("Years At Company cannot exceed Total Working Years")
+            valid = False
 
-    # -----------------------------
-    # Display Result
-    # -----------------------------
-    st.subheader("Prediction Result")
+        if years_role > years_company:
+            st.error("Years In Current Role cannot exceed Years At Company")
+            valid = False
 
-    prediction_percent = prediction * 100
-    st.metric("Attrition Probability", f"{prediction_percent:.2f}%")
+        if valid:
 
-    if prediction_percent >= 70:
-        st.error("🚨 High Attrition Risk")
-    elif prediction_percent >= 30:
-        st.warning("⚠️ Medium Attrition Risk")
-    else:
-        st.success("✅ Low Attrition Risk")
+            input_data = pd.DataFrame({
+                'Age':[age],
+                'BusinessTravel':[business_travel],
+                'Department':[department],
+                'DistanceFromHome':[distance],
+                'Education':[education],
+                'EnvironmentSatisfaction':[env_sat],
+                'Gender':[gender],
+                'MonthlyIncome':[salary],
+                'JobInvolvement':[job_involvement],
+                'JobLevel':[job_level],
+                'JobRole':[job_role],
+                'JobSatisfaction':[job_satisfaction],
+                'MaritalStatus':[marital_status],
+                'NumCompaniesWorked':[companies_worked],
+                'OverTime':[overtime],
+                'PercentSalaryHike':[salary_hike],
+                'TotalWorkingYears':[total_exp],
+                'WorkLifeBalance':[work_life],
+                'YearsAtCompany':[years_company],
+                'YearsInCurrentRole':[years_role],
+                'YearsSinceLastPromotion':[years_promo],
+                'ExperienceRatio':[ExperienceRatio],
+                'PromotionGap':[PromotionGap],
+                'IncomePerLevel':[IncomePerLevel],
+                'CompanySwitchRate':[CompanySwitchRate],
+                'RoleStability':[RoleStability],
+                'PromotionDelay':[PromotionDelay],
+                'LowIncomeFlag':[LowIncomeFlag]
+            })
 
-    # Possible reasons
-    st.subheader("Possible Reasons:")
-    reasons = []
-    if overtime=="Yes":
-        reasons.append("Frequent Overtime")
-    if job_satisfaction <= 2:
-        reasons.append("Low Job Satisfaction")
-    if env_sat <= 2:
-        reasons.append("Poor Work Environment")
-    if distance > 20:
-        reasons.append("Long Commute")
-    if salary < 30000:
-        reasons.append("Low Salary")
-    if years_promo > 5:
-        reasons.append("No promotion for long time")
+            input_encoded = pd.get_dummies(input_data)
 
-    if not reasons:
-        st.write("No strong attrition indicators detected.")
-    else:
-        for r in reasons:
-            st.write("•", r)
+            feedback_vector = vectorizer.transform([feedback if feedback else ""])
+            feedback_df = pd.DataFrame(
+                feedback_vector.toarray(),
+                columns=vectorizer.get_feature_names_out()
+            )
+
+            final_input = pd.concat([input_encoded, feedback_df], axis=1)
+            final_input = final_input.reindex(columns=model_columns, fill_value=0)
+
+            prediction = model.predict_proba(final_input)[0][1]
+
+            prediction_percent = prediction * 100
+
+            colA, colB, colC = st.columns([1,2,1])
+
+            with colB:
+                st.markdown(
+                f"""
+                <div style="text-align:center;">
+                    <h5>Attrition Probability</h5>
+                    <h1>{prediction_percent:.2f}%</h1>
+                </div>
+                """,
+                unsafe_allow_html=True
+                )
+                # Progress bar visualization
+                st.progress(prediction)
+                st.caption("Attrition Risk Meter")
+
+
+            # colA, colB, colC = st.columns([1,2,1])
+
+            # with colB:
+                # if prediction_percent >= 70:
+                #     st.error("🚨 High Attrition Risk")
+                # elif prediction_percent >= 30:
+                #     st.warning("⚠️ Medium Attrition Risk")
+                # else:
+                #     st.success("✅ Low Attrition Risk")
+
+                if prediction_percent >= 70:
+                    st.markdown(
+                    "<div style='text-align:center; background:#ece0e7; padding:15px; border-radius:8px;'>🚨 High Attrition Risk</div>",
+                    unsafe_allow_html=True
+                    )
+
+                elif prediction_percent >= 30:
+                    st.markdown(
+                    "<div style='text-align:center; background:#ecf0e3; padding:15px; border-radius:8px;'>⚠️ Medium Attrition Risk</div>",
+                    unsafe_allow_html=True
+                    )
+
+                else:
+                    st.markdown(
+                    "<div style='text-align:center; background:#d5edea; padding:15px; border-radius:8px;'>✅ Low Attrition Risk</div>",
+                    unsafe_allow_html=True
+                    )
+            st.markdown(
+            "<h2 style='text-align:center;'>Possible Reasons</h2>",
+            unsafe_allow_html=True
+            )
+
+            reasons = []
+
+            if overtime == "Yes":
+                reasons.append("Frequent Overtime")
+
+            if job_satisfaction <= 2:
+                reasons.append("Low Job Satisfaction")
+
+            if env_sat <= 2:
+                reasons.append("Poor Work Environment")
+
+            if distance > 20:
+                reasons.append("Long Commute")
+
+            if salary < 30000:
+                reasons.append("Low Salary")
+
+            if years_promo > 5:
+                reasons.append("No promotion for long time")
+
+            colA, colB, colC = st.columns([1,2,1])
+
+            with colB:
+                if not reasons:
+                    st.markdown(
+                    "<p style='text-align:center;'>No strong attrition indicators detected.</p>",
+                    unsafe_allow_html=True
+                    )
+                else:
+                    for r in reasons:
+                        st.markdown(
+                        f"<p style='text-align:center;'>• {r}</p>",
+                        unsafe_allow_html=True
+                        )
+
+st.divider()
 
 # -----------------------------
 # Power BI Dashboard
 # -----------------------------
-st.title("Power BI Dashboard")
+st.markdown(
+"<h3 style='text-align:center;'>📈 HR Analytics Dashboard</h3>",
+unsafe_allow_html=True
+)
 
 powerbi_iframe = """
-<iframe title="MH 2026 copy - Copy"
+<iframe title="HR Dashboard"
 width="100%"
-height="450"
+height="900"
 src="https://app.powerbi.com/view?r=eyJrIjoiYzE4YmRhMDgtNGJhNC00ZTE0LThiOGItNDI0NDg2YTg5NWNjIiwidCI6IjQwZjkzODFiLWViNzEtNDlhMi1iMjVhLWU3MDBkNDgxZDVjMSJ9"
 frameborder="0"
 allowFullScreen="true">
 </iframe>
 """
 
-components.html(powerbi_iframe, height=450)
-
+components.html(powerbi_iframe, height=900)
 
 
 
